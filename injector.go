@@ -66,12 +66,17 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 }
 
 func (inj *injector) injectFile(src, con, tgt string) error {
-	// TODO revise with cmd.Stdin
 	cmd := exec.Command(
-		"docker", "exec", "-it", con,
-		"/bin/bash", "-c", "'cat > "+tgt+"'", "<", src,
+		"docker", "exec", "-i", con,
+		"/bin/bash", "-c", "cat > "+tgt,
 	)
-	cmd.Stderr = os.Stderr
+	f, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	cmd.Stdin = f
+	cmd.Stderr = inj.stderr
 	if err := cmd.Run(); err != nil {
 		return err
 	}
@@ -80,7 +85,7 @@ func (inj *injector) injectFile(src, con, tgt string) error {
 
 func (inj *injector) injectDir(con, tgt string) error {
 	cmd := exec.Command("docker", "exec", "-it", con, "mkdir", "-p", tgt)
-	cmd.Stderr = os.Stderr
+	cmd.Stderr = inj.stderr
 	if err := cmd.Run(); err != nil {
 		return err
 	}
