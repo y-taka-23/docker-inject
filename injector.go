@@ -12,6 +12,7 @@ import (
 
 type injector struct {
 	stderr    io.Writer
+	source    string
 	hostRoot  string
 	container string
 	contRoot  string
@@ -29,16 +30,18 @@ func newInjector(w io.Writer, args []string) (*injector, error) {
 	if len(args) != 2 {
 		return nil, errors.New("two arguments required")
 	}
-	hRoot, err := filepath.Abs(args[0])
+	origin, err := filepath.Abs(args[0])
 	if err != nil {
 		return nil, err
 	}
+	hRoot := filepath.Dir(origin)
 	cont, cRoot, err := parseTarget(args[1])
 	if err != nil {
 		return nil, err
 	}
 	return &injector{
 		stderr:    w,
+		source:    origin,
 		hostRoot:  hRoot,
 		container: cont,
 		contRoot:  cRoot,
@@ -46,7 +49,7 @@ func newInjector(w io.Writer, args []string) (*injector, error) {
 }
 
 func (inj *injector) run() error {
-	return filepath.Walk(inj.hostRoot, inj.inject)
+	return filepath.Walk(inj.source, inj.inject)
 }
 
 func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
@@ -57,7 +60,8 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	if err != nil {
 		return err
 	}
-	tgt := filepath.Join(inj.contRoot, rel)
+	// filepath.Join doesn't work, since containers are on Linux
+	tgt := inj.contRoot + "/" + rel
 	if fi.IsDir() {
 		return inj.injectDir(inj.container, tgt)
 	} else {
@@ -84,7 +88,7 @@ func (inj *injector) injectFile(src, con, tgt string) error {
 }
 
 func (inj *injector) injectDir(con, tgt string) error {
-	cmd := exec.Command("docker", "exec", "-it", con, "mkdir", "-p", tgt)
+	cmd := exec.Command("docker", "exec", con, "mkdir", "-p", tgt)
 	cmd.Stderr = inj.stderr
 	if err := cmd.Run(); err != nil {
 		return err
