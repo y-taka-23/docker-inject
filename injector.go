@@ -60,13 +60,17 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	if err != nil {
 		return err
 	}
-	// filepath.Join doesn't work, since containers are on Linux
-	tgt := inj.contRoot + "/" + rel
-	if fi.IsDir() {
+	// TODO respond to Windows
+	tgt := filepath.Join(inj.contRoot, rel)
+	dir := filepath.Dir(tgt)
+	if !fi.IsDir() {
+		err := inj.injectDir(inj.container, dir)
+		if err != nil {
+			return err
+		}
 		return inj.injectDir(inj.container, tgt)
-	} else {
-		return inj.injectFile(path, inj.container, tgt)
 	}
+	return nil
 }
 
 func (inj *injector) injectFile(src, con, tgt string) error {
@@ -87,8 +91,8 @@ func (inj *injector) injectFile(src, con, tgt string) error {
 	return nil
 }
 
-func (inj *injector) injectDir(con, tgt string) error {
-	cmd := exec.Command("docker", "exec", con, "mkdir", "-p", tgt)
+func (inj *injector) injectDir(con, dir string) error {
+	cmd := exec.Command("docker", "exec", con, "mkdir", "-p", dir)
 	cmd.Stderr = inj.stderr
 	if err := cmd.Run(); err != nil {
 		return err
