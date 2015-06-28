@@ -15,6 +15,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.HelpFlag,
 	}
+	cli.AppHelpTemplate = appHelpTemplate
 	app.Action = func(c *cli.Context) {
 		inj, err := newInjector(os.Stderr, c.Args())
 		if err != nil {
