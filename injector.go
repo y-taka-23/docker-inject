@@ -60,9 +60,8 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	if err != nil {
 		return err
 	}
-	// TODO respond to Windows
 	tgt := filepath.Join(inj.contRoot, rel)
-	dir := filepath.Dir(tgt)
+	dir := filepath.ToSlash(filepath.Dir(tgt)) // containers are based on Linux
 	if !fi.IsDir() {
 		err := inj.injectDir(inj.container, dir)
 		if err != nil {
