@@ -68,7 +68,7 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 		if err != nil {
 			return err
 		}
-		return inj.injectDir(inj.container, tgt)
+		return inj.injectFile(path, inj.container, tgt)
 	}
 	return nil
 }
