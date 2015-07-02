@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -61,13 +62,21 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 		return err
 	}
 	tgt := filepath.Join(inj.contRoot, rel)
-	dir := filepath.ToSlash(filepath.Dir(tgt)) // containers are based on Linux
 	if !fi.IsDir() {
+		// convert the path; containers are based on Linux
+		dir := filepath.ToSlash(filepath.Dir(tgt))
 		err := inj.injectDir(inj.container, dir)
 		if err != nil {
 			return err
 		}
 		return inj.injectFile(path, inj.container, tgt)
+	}
+	fis, err := ioutil.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	if len(fis) == 0 {
+		return inj.injectDir(inj.container, tgt)
 	}
 	return nil
 }
