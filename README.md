@@ -14,7 +14,6 @@ Download the appropriate zip package for your system.
 
 * [Linux (64bit)](https://github.com/y-taka-23/docker-inject/releases/download/v0.1.0/docker-inject_0.1.0_linux_amd64.zip)
 * [Mac OS X (64bit)](https://github.com/y-taka-23/docker-inject/releases/download/v0.1.0/docker-inject_0.1.0_darwin_amd64.zip)
-* [Windows (64bit)](https://github.com/y-taka-23/docker-inject/releases/download/v0.1.0/docker-inject_0.1.0_windows_amd64.zip)
 
 After downloading, unzip the package and copy the `docker-inject` binary
 to somewhere on the `PATH` so that it can be executed.

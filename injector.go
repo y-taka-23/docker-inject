@@ -63,8 +63,7 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	}
 	tgt := filepath.Join(inj.contRoot, rel)
 	if !fi.IsDir() {
-		// convert the path; containers are based on Linux
-		dir := filepath.ToSlash(filepath.Dir(tgt))
+		dir := filepath.Dir(tgt)
 		err := inj.injectDir(inj.container, dir)
 		if err != nil {
 			return err
