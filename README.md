@@ -6,7 +6,7 @@ Copy files/directories from hosts to running Docker containers.
 ## Requirement
 
 * [Docker 1.3+](https://www.docker.com/)
-* [boot2docker](http://boot2docker.io/) (for Mac OS X and Windows)
+* [boot2docker](http://boot2docker.io/) (for Mac OS X)
 
 ## Installation
 
