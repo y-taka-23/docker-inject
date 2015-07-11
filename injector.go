@@ -64,11 +64,10 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	tgt := filepath.Join(inj.contRoot, rel)
 	if !fi.IsDir() {
 		dir := filepath.Dir(tgt)
-		err := inj.injectDir(inj.container, dir)
-		if err != nil {
+		if err := inj.injectDir(inj.container, dir); err != nil {
 			return err
 		}
-		return inj.injectFile(path, inj.container, tgt, fi.Mode())
+		return inj.injectFile(path, inj.container, tgt)
 	}
 	fis, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -80,10 +79,10 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 	return nil
 }
 
-func (inj *injector) injectFile(src, con, tgt string, fm os.FileMode) error {
+func (inj *injector) injectFile(src, con, tgt string) error {
 	cmd := exec.Command(
 		"docker", "exec", "-i", con,
-		"/bin/bash", "-c", "cat > "+tgt, "&& /bin/chmod "+string(fm)+" "+tgt,
+		"/bin/bash", "-c", "cat > "+tgt,
 	)
 	f, err := os.Open(src)
 	if err != nil {
