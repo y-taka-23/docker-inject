@@ -67,7 +67,10 @@ func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
 		if err := inj.injectDir(inj.container, dir); err != nil {
 			return err
 		}
-		return inj.injectFile(path, inj.container, tgt)
+		if err := inj.injectFile(path, inj.container, tgt); err != nil {
+			return err
+		}
+		return inj.changeMode(inj.container, tgt, fi.Mode())
 	}
 	fis, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -90,6 +93,17 @@ func (inj *injector) injectFile(src, con, tgt string) error {
 	}
 	defer f.Close()
 	cmd.Stdin = f
+	cmd.Stderr = inj.stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (inj *injector) changeMode(con, tgt string, fm os.FileMode) error {
+	cmd := exec.Command(
+		"docker", "exec", con, "chmod", fmt.Sprintf("%o", fm), tgt,
+	)
 	cmd.Stderr = inj.stderr
 	if err := cmd.Run(); err != nil {
 		return err
