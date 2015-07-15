@@ -3,6 +3,20 @@ Copy files/directories from hosts to running Docker containers.
 
 ## Description
 
+Surely you sometimes desire to copy files
+from your host machine to running Docker containers.
+Indeed `docker cp` provide the way to copy files from containers to hosts,
+but we have no command for the retrorse copying.
+
+One of the ways to transport objects is to mount a directory
+by the `-v` option of `docker run` and use the directory as a portal.
+Meanwhile this method is, as you might notice,
+completely helpless for running containers.
+
+Docker Inject provide the way to copy objects from hosts to running containers.
+With the command, you are able to inject not only a single file
+but also directories recursively.
+
 ## Requirement
 
 * [Docker 1.3+](https://www.docker.com/)
