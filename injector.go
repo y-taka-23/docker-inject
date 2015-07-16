@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -53,26 +54,26 @@ func (inj *injector) run() error {
 	return filepath.Walk(inj.source, inj.inject)
 }
 
-func (inj *injector) inject(path string, fi os.FileInfo, e error) error {
+func (inj *injector) inject(curr string, fi os.FileInfo, e error) error {
 	if e != nil {
 		return e
 	}
-	rel, err := filepath.Rel(inj.hostRoot, path)
+	rel, err := filepath.Rel(inj.hostRoot, curr)
 	if err != nil {
 		return err
 	}
-	tgt := filepath.Join(inj.contRoot, rel)
+	tgt := path.Join(inj.contRoot, filepath.ToSlash(rel))
 	if !fi.IsDir() {
-		dir := filepath.Dir(tgt)
+		dir := path.Dir(tgt)
 		if err := inj.injectDir(inj.container, dir); err != nil {
 			return err
 		}
-		if err := inj.injectFile(path, inj.container, tgt); err != nil {
+		if err := inj.injectFile(curr, inj.container, tgt); err != nil {
 			return err
 		}
 		return inj.changeMode(inj.container, tgt, fi.Mode())
 	}
-	fis, err := ioutil.ReadDir(path)
+	fis, err := ioutil.ReadDir(curr)
 	if err != nil {
 		return err
 	}
