@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/codegangsta/cli"
 	"io"
 	"io/ioutil"
 	"os"
@@ -13,11 +14,13 @@ import (
 )
 
 type injector struct {
+	stdout    io.Writer
 	stderr    io.Writer
 	source    string
 	hostRoot  string
 	container string
 	contRoot  string
+	isVerbose bool
 }
 
 func parseTarget(s string) (string, string, error) {
@@ -28,7 +31,8 @@ func parseTarget(s string) (string, string, error) {
 	return strs[0], strs[1], nil
 }
 
-func newInjector(w io.Writer, args []string) (*injector, error) {
+func newInjector(o, e io.Writer, c *cli.Context) (*injector, error) {
+	args := c.Args()
 	if len(args) != 2 {
 		return nil, errors.New("two arguments required")
 	}
@@ -42,11 +46,13 @@ func newInjector(w io.Writer, args []string) (*injector, error) {
 		return nil, err
 	}
 	return &injector{
-		stderr:    w,
+		stdout:    o,
+		stderr:    e,
 		source:    origin,
 		hostRoot:  hRoot,
 		container: cont,
 		contRoot:  cRoot,
+		isVerbose: c.Bool("verbose"),
 	}, nil
 }
 
@@ -68,6 +74,9 @@ func (inj *injector) inject(curr string, fi os.FileInfo, e error) error {
 		if err := inj.injectDir(inj.container, dir); err != nil {
 			return err
 		}
+		if err := inj.showProgress(rel, tgt); err != nil {
+			return err
+		}
 		if err := inj.injectFile(curr, inj.container, tgt); err != nil {
 			return err
 		}
@@ -78,6 +87,9 @@ func (inj *injector) inject(curr string, fi os.FileInfo, e error) error {
 		return err
 	}
 	if len(fis) == 0 {
+		if err := inj.showProgress(rel, tgt); err != nil {
+			return err
+		}
 		return inj.injectDir(inj.container, tgt)
 	}
 	return nil
@@ -119,4 +131,12 @@ func (inj *injector) injectDir(con, dir string) error {
 		return err
 	}
 	return nil
+}
+
+func (inj *injector) showProgress(src, tgt string) error {
+	if !inj.isVerbose {
+		return nil
+	}
+	_, err := fmt.Fprintf(inj.stdout, "%s -> %s\n", src, tgt)
+	return err
 }
