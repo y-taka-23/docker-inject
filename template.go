@@ -4,7 +4,7 @@ var appHelpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   {{.Name}} [OPTIONS] HOSTDIR CONTAINER:PATH
+   {{.Name}} [OPTIONS] HOSTPATH CONTAINER:PATH
 
 VERSION:
    {{.Version}}

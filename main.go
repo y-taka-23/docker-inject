@@ -9,7 +9,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "docker-inject"
-	app.Usage = "Copy files/directories from hosts to running Docker containers"
+	app.Usage = "Copy files/folders from hosts to running Docker containers"
 	app.Version = "0.0.0"
 	app.HideHelp = true
 	app.Flags = []cli.Flag{
