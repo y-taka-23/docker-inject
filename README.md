@@ -18,6 +18,10 @@ Docker Inject provide the way to copy objects from hosts to running containers.
 With the command, you are able to inject not only a single file
 but also directories recursively.
 
+## Demo
+
+[![asciicast](https://asciinema.org/a/9y6qdrv6daymz9vhf1ynktvmx.png)](https://asciinema.org/a/9y6qdrv6daymz9vhf1ynktvmx)
+
 ## Requirement
 
 * [Docker 1.3+](https://www.docker.com/)
@@ -40,8 +44,6 @@ thus you can build the latest version from the source by:
 ```
 $ go get https://github.com/y-taka-23/docker-inject
 ```
-
-## Usage
 
 ## License
 
