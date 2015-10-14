@@ -1,4 +1,6 @@
-# Docker Inject [![Build Status](https://travis-ci.org/y-taka-23/docker-inject.svg?branch=master)](https://travis-ci.org/y-taka-23/docker-inject)
+# Docker Inject
+
+[![Build Status](https://travis-ci.org/y-taka-23/docker-inject.svg?branch=master)](https://travis-ci.org/y-taka-23/docker-inject)
 
 Copy files/directories from hosts to running Docker containers.
 
